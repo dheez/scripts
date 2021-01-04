@@ -1,14 +1,20 @@
 #!/bin/bash
-mode=$(printf 'mount\nunmount\nexit' | dmenu -p "select mode" -i -l 10)
+# dmenu script to mount/unmount usb drives
+# dependencies: dmenu, systemd
+# edit the lines with udisksctl if you use a distribution without systemd
+# like I did on my laptop
+
+menu="dmenu -nb #000000 -nf #aaaaaa -sb #000000 -sf #ff8c00 -i -l 10" #dmenu appearance, edit to your liking
+mode=$(printf 'mount\nunmount\nexit' | $menu -p "select mode") #select mode prompt
 if [ $mode == "mount" ]; then
-	drive=$(lsblk --noheadings --raw -o NAME,MOUNTPOINT | awk '$1~/s.*/ && $2 == ""' | dmenu -p "select drive to mount" -i -l 10)
+	drive=$(lsblk --noheadings --raw -o NAME,MOUNTPOINT | awk '$1~/s.*/ && $2 == ""' | $menu -p "select drive to mount")
 	drive=/dev/$drive
-	udisksctl mount -b $drive
+	udisksctl mount -b $drive 	#mount the drive with udisksctl
 fi
 if [ $mode == "unmount" ]; then
-	drive=$(lsblk --noheadings --raw -o NAME,MOUNTPOINT | awk '$1~/s.*/ && $2 != ""' | awk '{print $1}' | dmenu -p "select drive to unmount" -i -l 10)
+	drive=$(lsblk --noheadings --raw -o NAME,MOUNTPOINT | awk '$1~/s.*/ && $2 != ""' | awk '{print $1}' | $menu -p "select drive to unmount")
 	drive=/dev/$drive
-	udisksctl unmount -b $drive
+	udisksctl unmount -b $drive 	#unmount with udisksctl
 fi
 if [ $mode == "exit" ]; then
 	exit 0
