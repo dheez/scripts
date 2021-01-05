@@ -11,12 +11,15 @@ defcmd="fzf"
 #guicmd="rofi -dmenu -i" #uncomment next line for dmenu
 guicmd="dmenu -nb #000000 -nf #aaaaaa -sb #000000 -sf #ff8c00 -i -l 15"
 promptcmd="$defcmd"
+touch $HOME/.config/.subscribedlist.txt
 if [ -z "$*" ]; then 
 	echo -n "Search: "
 	read -r query
 else
 	case "$1" in
 		-r) query=$(echo | $guicmd -p "Search: ")
+			promptcmd="$guicmd -p Video:";;
+		-s) query=$(cat $HOME/.config/.subscribedlist.txt  | $guicmd -p "Choose from Sublist: ")
 			promptcmd="$guicmd -p Video:";;
 		*) query="$*";;
 	esac
@@ -31,13 +34,20 @@ query=$(sed \
 	<<< "$query")
 # fetch the results with the $query and
 # delete all escaped characters
-response="$(curl -s "https://www.youtube.com/results?search_query=$query" |\
+if [ "$1" == "-s" ]; then
+	response="$(curl -s "https://www.youtube.com/user/$query/videos" |\
 	sed 's|\\.||g')"
+else
+	response="$(curl -s "https://www.youtube.com/results?search_query=$query" |\
+	sed 's|\\.||g')"
+fi
 # if unable to fetch the youtube results page, inform and exit
 if ! grep -q "script" <<< "$response"; then echo "unable to fetch yt"; exit 1; fi
 # regex expression to match video and playlist entries from yt result page
 vgrep='"videoRenderer":{"videoId":"\K.{11}".+?"text":".+?[^\\](?=")'
 pgrep='"playlistRenderer":{"playlistId":"\K.{34}?","title":{"simpleText":".+?[^\"](?=")'
+ugrep='"gridVideoRenderer":{"videoId":"\K.{11}".+?"text".+?[^\\](?=")'
+
 # grep the id and title
 # return them in format id (type) title
 getresults() {
@@ -47,9 +57,11 @@ getresults() {
 # get the list of videos/playlists and their ids in videoids and playlistids
 videoids=$(getresults "$vgrep")
 playlistids=$(getresults "$pgrep" "(playlist)")
+userids=$(getresults "$ugrep")
 # if there are playlists or videos, append them to list
 [ -n "$playlistids" ] && ids="$playlistids\n"
 [ -n "$videoids" ] && ids="$ids$videoids"
+[ -n "$userids" ] && ids="$ids$userids"
 # url prefix for videos and playlists
 videolink="https://youtu.be/"
 playlink="https://youtube.com/playlist?list="
