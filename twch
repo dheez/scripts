@@ -1,34 +1,41 @@
 #!/bin/bash
 #dependencies dmenu, mpv, youtube-dl
-#inspired by https://github.com/sayan01 and his yt script!
-#quick script to choose and play twitch stream via dmenu and mpv
-#
-cmd="dmenu -nb #000000 -sb #000000 -nf #aaaaaa -sf #ff8c00 -i -l 10" #format dmenu to your liking
-link="https://twitch.tv" 		#constant link
-touch $HOME/.config/.streamers.txt	#create list of streamers if it doesn't exist already
+cmd="dmenu -nb #000000 -sb #000000 -nf #aaaaaa -sf #ff8c00 -i -l 10"
+link="https://twitch.tv"
+touch $HOME/.streamers.txt
 
-if [ -z $1 ]; then	
-	streamer=$(cat $HOME/.config/.streamers.txt | $cmd -p "choose streamer") 	#no argument given
+if [ -z $1 ]; then
+	streamer=$(cat $HOME/.streamers.txt | $cmd -p "choose streamer")
 else
-	streamer=$1				#else argument is used as streamer to search
+	streamer=$1
 fi
 
 
-if [ -z $streamer ]; then			#if no streamer is chosen
+if [ -z $streamer ]; then
 	notify-send "no streamer chosen!"
 	exit 0
 fi
 
-
-slink="$link/$streamer"				#building the link
-notify-send "requesting $slink"
-mpvout="$(mpv $slink 2>&1)"			#saving mpv's output under variable
-offline="$(echo $mpvout | grep offline)"	#if the streamer is offline, this var will not be empty
-
-if [ "$offline" == "" ]; then			#if var is empty, it means streamer is online
-	if [ -z $(grep $streamer $HOME/.config/.streamers.txt) ]; then	#if streamer online, put him
-		echo $streamer >> $HOME/.config/.streamers.txt		#on the streamer list
-	fi								
-else
-	notify-send "$streamer is offline! :("				#self explanatory
-fi
+while true; do
+	if [ ! -z $streamer ]; then
+		slink="$link/$streamer"
+		notify-send "requesting $slink"
+		mpvout="$(mpv $slink 2>&1)"
+		
+		offline="$(echo $mpvout | grep offline)"	
+		if [ "$offline" == "" ]; then
+			if [ -z $(grep $streamer $HOME/.streamers.txt) ]; then
+				echo $streamer >> $HOME/.streamers.txt
+			fi
+		else
+			notify-send "$streamer is offline! :("
+		fi
+		
+		streamer=$( cat $HOME/.streamers.txt | $cmd -p "choose streamer" )
+	else
+		notify-send "no streamer chosen!"
+		break
+		
+	fi
+	
+done
