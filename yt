@@ -35,7 +35,7 @@ query=$(sed \
 # fetch the results with the $query and
 # delete all escaped characters
 if [ "$1" == "-s" ]; then
-	response="$(curl -s "https://www.youtube.com/user/$query/videos" |\
+	response="$(curl -s "https://www.youtube.com/c/$query/videos" |\
 	sed 's|\\.||g')"
 else
 	response="$(curl -s "https://www.youtube.com/results?search_query=$query" |\
