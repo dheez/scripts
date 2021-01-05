@@ -37,6 +37,10 @@ query=$(sed \
 if [ "$1" == "-s" ]; then
 	response="$(curl -s "https://www.youtube.com/c/$query/videos" |\
 	sed 's|\\.||g')"
+	if ! grep -q "script" <<< "$response"; then
+		response="$(curl -s "https://www.youtube.com/user/$query/videos" |\
+		sed 's|\\.||g')"
+	fi
 else
 	response="$(curl -s "https://www.youtube.com/results?search_query=$query" |\
 	sed 's|\\.||g')"
