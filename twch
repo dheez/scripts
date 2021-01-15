@@ -20,9 +20,9 @@ while true; do
 	if [ ! -z $streamer ]; then
 		slink="$link/$streamer"
 		notify-send "requesting $slink"
-		mpvout="$(mpv $slink 2>&1)"
+		mpvout="$(streamlink --player mpv $slink best 2>&1)"
 		
-		offline="$(echo $mpvout | grep offline)"	
+		offline="$(echo $mpvout | grep "No playable streams found")"	
 		if [ "$offline" == "" ]; then
 			if [ -z $(grep $streamer $HOME/.streamers.txt) ]; then
 				echo $streamer >> $HOME/.streamers.txt
