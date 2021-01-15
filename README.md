@@ -6,7 +6,7 @@ other machines. \
 feel free to use and edit for your own usecase!
 
 ## yt
-dependencies: dmenu, fzf, youtube-dl  \
+dependencies: dmenu, fzf, youtube-dl, mpv \
 added -s option to script to read from your .subscribedlist.txt file
 in your .config folder. It gets created automatically but is empty.  \
 Just echo your favorite youtubers channel names into the txt file!
@@ -20,11 +20,15 @@ Also, to use the -s option, you have to have dmenu installed.  \
 originally (without -s option) by https://github.com/sayan01
 
 ## twch
-dependencies: dmenu, youtube-dl  \
+dependencies: dmenu, youtube-dl, mpv, streamlink  \
 works similarly to yt, but alot simpler. Using the script opens dmenu and prompts you to type in a twitch streamer name.  \
 If the streamer is online, it will play the stream and put him into a txt file which gets read by the script the next time (so you can
 more easily choose the streamers.)  \
-If the streamer is offline, it does not put the name in the list and tells you that the streamer is offline! simple as that. 
+If the streamer is offline, it does not put the name in the list and tells you that the streamer is offline! simple as that. \
+uses streamlink now, because of annoying ad breaks which take longer than a minute... \
+just download streamlink from your package manager. \
+you can use it with any media player, I use mpv, u have to edit the script where it says mpv to match your own mediaplayer (for example vlc) \
+streamlinks default media player is vlc I think. \
 
 ## mntctl
 dependencies: dmenu, systemd (this version)  \
