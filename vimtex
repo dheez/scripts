@@ -1,5 +1,6 @@
 #!/bin/bash
 if [ ! -z $1 ]; then
+	touch "$1.tex"
 	termite -e "vim $1.tex" & disown	#open vim in new terminal
 	convert xc:none -page A4 "$1.pdf"	#create blank pdf
 	current="$(cat $1.tex)"			#current state of tex file
