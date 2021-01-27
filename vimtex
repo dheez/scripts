@@ -13,4 +13,6 @@ if [ ! -z $1 ]; then
 		else sleep 1	#else wait a second
 		fi
 	done
+else
+	echo "needs one argument with the name of the file you want to create."
 fi
