@@ -3,13 +3,13 @@ if [ ! -z $1 ]; then
 	touch "$1.tex"
 	termite -e "vim $1.tex" & disown	#open vim in new terminal
 	convert xc:none -page A4 "$1.pdf"	#create blank pdf
-	current="$(cat $1.tex)"			#current state of tex file
+	current="$(md5sum $1.tex)"			#current state of tex file
 	mupdf "$1.pdf" & disown			#open blank pdf
 	while true; do
-		if [ ! "$current" == "$(cat $1.tex)" ]; then #any differences?
+		if [ ! "$current" == "$(md5sum $1.tex)" ]; then #any differences?
 			pdflatex "$1.tex"		#compile tex file
 			killall -s SIGHUP mupdf		#update mupdf 
-			current="$(cat $1.tex)"		#set current
+			current="$(md5sum $1.tex)"		#set current
 		else sleep 1	#else wait a second
 		fi
 	done
