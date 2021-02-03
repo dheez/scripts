@@ -7,7 +7,7 @@ for playlist in $mdir/*; do
 	paths=$paths"$playlist\n"
 done
 
-plchoice=$(echo -e $paths | awk -F / '{ print $5 }' | $cmd -p "select playlist") &&
+plchoice=$(echo -e $paths | awk -F / '{ print $(NF) }' | $cmd -p "select playlist") &&
 
 if [ "$1" == "-s" ]; then
 	termite -e "mpv $mdir/$plchoice --shuffle" & disown
@@ -16,10 +16,14 @@ else
 		for song in $mdir/$plchoice/*; do
 			songs=$songs"$song\n"
 		done
-
-		schoice=$(echo -e $songs | awk -F / '{ print $(NF) }' | $cmd -p "select song") &&
-		termite -e "mpv $mdir/$plchoice/$schoice" & disown	
-
+		
+		while true; do
+			schoice=$(echo -e $songs | awk -F / '{ print $(NF) }' | $cmd -p "select song")
+			if [ -z $schoice ]; then break
+			else
+				termite -e "mpv $mdir/$plchoice/$schoice" 
+			fi
+		done
 	else
 		termite -e "mpv $mdir/$plchoice" & disown
 	fi
