@@ -45,3 +45,10 @@ dependencies: texlive-full, (vim, termite), mupdf \
 A script I wrote, which opens vim in a new terminal (in this case termite) and mupdf, everytime you write to your tex file, the mupdf file updates, \
 so you get a live view of the pdf file your working on. \
 would work for any texteditor and probably any terminal emulator, you just gotta edit the lines in the short script to use your specific programs (for example gedit or something)
+
+## music
+dependencies: dmenu, mpv \
+simple dmenu script to choose music in your Music directory in your home directory. Obivously you must create one first and put your albums/playlists in it (folders with music files) \
+has a shuffle option "-s" and a choose option "-c" in which you choose song. \
+default option is playing the songs in order. \
+usage: for example music -s or music -c in terminal or dmenu
