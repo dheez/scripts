@@ -10,7 +10,7 @@ done
 plchoice=$(echo -e $paths | awk -F / '{ print $(NF) }' | $cmd -p "select playlist") &&
 
 if [ "$1" == "-s" ]; then
-	termite -e "mpv $mdir/$plchoice --shuffle" & disown
+	termite -e "mpv '$mdir/$plchoice' --shuffle" & disown
 else
 	if [ "$1" == "-c" ]; then
 		for song in $mdir/$plchoice/*; do
@@ -21,11 +21,11 @@ else
 			schoice=$(echo -e $songs | awk -F / '{ print $(NF) }' | $cmd -p "select song")
 			if [ -z $schoice ]; then break
 			else
-				termite -e "mpv $mdir/$plchoice/$schoice" 
+				termite -e "mpv '$mdir/$plchoice/$schoice'" 
 			fi
 		done
 	else
-		termite -e "mpv $mdir/$plchoice" & disown
+		termite -e "mpv '$mdir/$plchoice'" & disown
 	fi
 
 fi
