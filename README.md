@@ -37,11 +37,11 @@ into the terminal all the time. \
 edit the udisksctl lines to fit your use case (if you do not use systemd, like me on my laptop) 
 
 ## redyt
-dependencies: dmenu, sxiv, wget  \
+dependencies: dmenu, sxiv, wget, jq  \
 go to https://github.com/Bugswriter for more information. I just use his script to browse dank memes :D
 
 ## vimtex
-dependencies: texlive-full, (vim, termite), mupdf \
+dependencies: texlive-most, (vim, termite), mupdf, imagemagick \
 A script I wrote, which opens vim in a new terminal (in this case termite) and mupdf, everytime you write to your tex file, the mupdf file updates, \
 so you get a live view of the pdf file your working on. \
 would work for any texteditor and probably any terminal emulator, you just gotta edit the lines in the short script to use your specific programs (for example gedit or something)
