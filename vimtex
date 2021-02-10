@@ -6,7 +6,7 @@ if [ ! -z $1 ]; then
 	mupdf "$1.pdf" & disown			#open blank pdf
 	while true; do
 			inotifywait -q -e modify "$1.tex"
-			pdflatex -halt-on-error "$1.tex"	#compile tex file
+			pdflatex -halt-on-error -interaction=nonstopmode "$1.tex"
 			killall -s SIGHUP mupdf		#update mupdf 
 	done
 else
