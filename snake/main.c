@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
-#include<SDL2/SDL_ttf.h>
 #include "snake.c"
 int getrandom50(int rand);
 int main() 
