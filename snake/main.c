@@ -128,7 +128,7 @@ int main()
 	//SDL_RenderCopy(rend, scoretex, NULL, &scorebox);
 	SDL_RenderCopy(rend, ftex, NULL, &foodhitbox);
 	SDL_RenderPresent(rend);
-	SDL_Delay(6000/60);
+	SDL_Delay(8000/144);
    }
 	if(collision(sn, sn->next)){
 		printf("GAME OVER\n");
