@@ -13,7 +13,7 @@ int main()
     SDL_Window* win = SDL_CreateWindow("SNAKE",				//init Window 
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
-                                       1920, 1080, 0); 
+                                       800, 600, 0); 
     if (win == NULL) {
 	printf("error");
 	SDL_DestroyWindow(win);
@@ -118,7 +118,7 @@ int main()
 	maxw = get50(maxw);
 	maxh = get50(maxh);
 	move(sn);//move according to global vars width and height
-	grow(sn);
+	placefood(grow(sn));
 	for(SNAKE* s = sn; s != NULL; s = s->next){
 		SDL_RenderCopy(rend,stex,NULL,&s->hitbox);
 	}

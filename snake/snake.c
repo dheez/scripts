@@ -66,8 +66,6 @@ SNAKE* last(SNAKE *sn){			//last struct of the snake
 int grow(SNAKE *sn){	//when snake eats the food, a new node is added to the back
 	SDL_Rect hit = sn->hitbox;
 	if (SDL_HasIntersection(&hit, &foodhitbox)){
-		foodhitbox.x = get50(rand() % maxw);
-		foodhitbox.y = get50(rand() % maxh);
 		SNAKE* l = last(sn);
 		SNAKE *tail = (SNAKE*)malloc(sizeof(SNAKE)); //important!! else segmentation fault.
 		tail->hitbox.x = l->oldpos[0];
@@ -79,4 +77,12 @@ int grow(SNAKE *sn){	//when snake eats the food, a new node is added to the back
 		return 1;
 	}
 	else return 0;
+}
+
+void placefood(int bool){	
+	if(bool || maxw < foodhitbox.x || maxh < foodhitbox.y){
+		foodhitbox.x = get50(rand() % maxw);
+		foodhitbox.y = get50(rand() % maxh);
+	}
+	
 }
