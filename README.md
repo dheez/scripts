@@ -52,3 +52,10 @@ simple dmenu script to choose music in your Music directory in your home directo
 has a shuffle option "-s" and a choose option "-c" in which you choose song. \
 default option is playing the songs in order. \
 usage: for example music -s or music -c in terminal or dmenu
+
+## snake
+dependencies: sdl2, sdl2_image libraries. \
+Really simple snake game I made to see if I would be able to do it lol. \
+made some basic textures in gimp just to have anything :D \
+to play, just install the sdl libraries through your package manager (pacman or apt or whatever), go into the snake directory and run "make". That should do it. \
+usage: ./snake-game
