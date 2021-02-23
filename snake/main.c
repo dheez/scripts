@@ -134,6 +134,7 @@ int main()
 		printf("GAME OVER\n");
 		printf("Score :%d\n", length(sn));
 	}
+   freesnake(sn);
    SDL_DestroyWindow(win);
    SDL_DestroyRenderer(rend);
    SDL_DestroyTexture(stex);

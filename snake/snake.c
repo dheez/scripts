@@ -86,3 +86,12 @@ void placefood(int bool){
 	}
 	
 }
+
+void freesnake(SNAKE* sn){
+	if(sn->next != NULL){
+		SNAKE* n = sn->next;
+		free(sn);
+		freesnake(n);
+	}
+	else free(sn);	
+}	
