@@ -1,20 +1,9 @@
-#include<stdio.h>
-#include<stdlib.h>
 #include<time.h>
 #include "snake.c"
-int getrandom50(int rand);
+int get50(int rand);
 int main() 
 { 
 	//char* sc;
-	srand(time(NULL)); //initializing random seed every second
-	SNAKE *sn = (SNAKE*)malloc(sizeof(SNAKE)); //declaring snake
-	sn->hitbox.x = getrandom50(rand() % 1870); //random position of snake at first
-	sn->hitbox.y = getrandom50(rand() % 1030);
-	sn->dir[0] = 0;
-	sn->dir[1] = 0;
-	sn->next = NULL;
-	foodhitbox.x = getrandom50(rand() % 1870);//random food pos
-	foodhitbox.y = getrandom50(rand() % 1030);
     // returns zero on success else non-zero 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {			//init SDL 
         printf("error initializing SDL: %s\n", SDL_GetError()); 
@@ -31,6 +20,16 @@ int main()
 	SDL_Quit();
 	return 1;
    }
+	SDL_GetWindowSize(win,&maxw,&maxh);
+	srand(time(NULL)); //initializing random seed every second
+	SNAKE *sn = (SNAKE*)malloc(sizeof(SNAKE)); //declaring snake
+	sn->hitbox.x = get50(rand() % maxw); //random position of snake at first
+	sn->hitbox.y = get50(rand() % maxh);
+	sn->dir[0] = 0;
+	sn->dir[1] = 0;
+	sn->next = NULL;
+	foodhitbox.x = get50(rand() % maxw);//random food pos
+	foodhitbox.y = get50(rand() % maxh);
 
 	Uint32 render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC; //init renderer
 	SDL_Renderer* rend = SDL_CreateRenderer(win, -1, render_flags);
@@ -56,7 +55,7 @@ int main()
 	//SDL_Surface* scoretext = TTF_RenderText_Solid(Sans, sc, green);
 	//SDL_Texture* scoretex = SDL_CreateTextureFromSurface(rend, scoretext); 
 	//SDL_FreeSurface(scoretext);
-	//SDL_Rect scorebox = (SDL_Rect){.x = 1870, .y = 1030};
+	//SDL_Rect scorebox = (SDL_Rect){.x = maxw, .y = maxh};
 	//SDL_QueryTexture(scoretex, NULL, NULL, &scorebox.w, &scorebox.h);
 
 
@@ -72,32 +71,14 @@ int main()
 	    SDL_FreeSurface(snak); 			//surfaces not needed anymore: free them
 	    SDL_FreeSurface(f);
             //Update the surface
-		SDL_SetRenderDrawColor(rend,0,0,0,255);
+		//SDL_SetRenderDrawColor(rend,255,255,255,255);
 		SDL_RenderClear(rend);	
-		SDL_RenderPresent(rend);
+		SDL_RenderPresent(rend);//show first frame
 
 		SDL_QueryTexture(stex, NULL, NULL, &sn->hitbox.w, &sn->hitbox.h);
 		SDL_QueryTexture(ftex, NULL, NULL, &foodhitbox.w, &foodhitbox.h);
 		
    SDL_Event e;				//event to capture input like keyboard
-/**
-	while(SDL_PollEvent(&e)){//randomly generate start direction
-		switch(e.type){
-			case SDL_KEYDOWN:
-			sn->dir[0] = rand() % 50;
-			if (sn->dir[0] != 0){
-				sn->dir[1] = 0;
-			}
-			else{
-				sn->dir[1] = rand() % 50;
-				if(sn->dir[1] == 0){
-					sn->dir[1] += 1;
-				}	
-			}
-			break;
-		}
-	}
-**/
    int quit = 0;
    while(!quit && !collision(sn, sn->next)){//main loop 
 		SDL_RenderClear(rend);
@@ -110,18 +91,22 @@ int main()
 			case SDL_KEYDOWN:
 				switch (e.key.keysym.scancode){//key handling
 					case SDL_SCANCODE_W:
+					case SDL_SCANCODE_UP:
 						sn->dir[1] = -50;
 						sn->dir[0] = 0;
 						break;
 					case SDL_SCANCODE_S:
+					case SDL_SCANCODE_DOWN:
 						sn->dir[1] = 50;
 						sn->dir[0] = 0;
 						break;
 					case SDL_SCANCODE_A:
+					case SDL_SCANCODE_LEFT:
 						sn->dir[0] = -50;
 						sn->dir[1] = 0;
 						break;
 					case SDL_SCANCODE_D:
+					case SDL_SCANCODE_RIGHT:
 						sn->dir[0] = 50;
 						sn->dir[1] = 0;
 						break;
@@ -129,31 +114,35 @@ int main()
 		} 
 
 	   }
-	move(sn);
+	SDL_GetWindowSize(win,&maxw,&maxh);//writes window width and height to previously declared global vars
+	maxw = get50(maxw);
+	maxh = get50(maxh);
+	move(sn);//move according to global vars width and height
+	grow(sn);
 	for(SNAKE* s = sn; s != NULL; s = s->next){
 		SDL_RenderCopy(rend,stex,NULL,&s->hitbox);
 	}
-	grow(sn);
-	for(SNAKE* s = sn; s != NULL; s = s -> next){
-		SDL_QueryTexture(stex, NULL, NULL, &s->hitbox.w, &s->hitbox.h);
-	}
+	SDL_QueryTexture(stex, NULL, NULL, &last(sn)->hitbox.w, &last(sn)->hitbox.h);
 	//sprintf(sc, "%d", score);
 	//SDL_QueryTexture(scoretex, NULL, NULL, &scorebox.w, &scorebox.h);
 	//SDL_RenderCopy(rend, scoretex, NULL, &scorebox);
 	SDL_RenderCopy(rend, ftex, NULL, &foodhitbox);
 	SDL_RenderPresent(rend);
-	SDL_Delay(8000/60);
+	SDL_Delay(6000/60);
    }
 	if(collision(sn, sn->next)){
 		printf("GAME OVER\n");
 		printf("Score :%d\n", length(sn));
 	}
    SDL_DestroyWindow(win);
+   SDL_DestroyRenderer(rend);
+   SDL_DestroyTexture(stex);
+   SDL_DestroyTexture(ftex);
    SDL_Quit();
    return 0;
 } 
 
-int getrandom50(int rand){
+int get50(int rand){
 	int rest = rand % 50;
 	return rand - rest;
 }
