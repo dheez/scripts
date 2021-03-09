@@ -2,11 +2,13 @@
 if [ ! -z $1 ]; then
 	touch "$1.tex"
 	termite -e "vim $1.tex" & disown	#open vim in new terminal
-	convert xc:none -page A4 "$1.pdf"	#create blank pdf
-	mupdf "$1.pdf" & disown			#open blank pdf
+	if [[ -z $(ls "./$1.pdf") ]]; then		#if pdf doesn't exist
+		convert xc:none -page A4 "$1.pdf"	#create blank pdf
+	fi
+	mupdf "$1.pdf" & disown			#open pdf
 	while true; do
-			inotifywait -q -e modify "$1.tex"
-			pdflatex -halt-on-error -interaction=nonstopmode "$1.tex"
+			inotifywait -q -e modify "$1.tex"				#wait for modification
+			pdflatex -halt-on-error -interaction=nonstopmode "$1.tex"	#compile tex to pdf
 			killall -s SIGHUP mupdf		#update mupdf 
 	done
 else
