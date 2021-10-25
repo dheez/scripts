@@ -1,0 +1,57 @@
+#!/bin/bash
+
+menucmd="dmenu -l 15"
+searchlink="https://mangakatana.com/?search="
+while true; do
+
+	if [[ "$1" == "-f" ]]; then
+		menucmd="fzf" 
+		echo Search:
+		read -r query
+	else 	
+		query=$(echo | $menucmd)
+	fi
+	[ -z "$query" ] && break;
+
+	query=$(tr ' ' '+' <<< $query)
+	site=$(curl -sL -w %{url_effective} $searchlink$query)
+	redir=$(echo $site | grep -Eo 'https://mangakatana.com/[a-zA-Z0-9."/?+=-]*' | tail -n1 )
+
+	if [ -n "$(grep search <<< $redir)" ]; then
+		mangas=$( echo $site | grep -Eo "https://mangakatana.com/manga/[a-zA-Z0-9./?+=-]*\">[a-zA-Z.0-9 /?:!'-]*</a>" | grep -Ev "/c[0-9.]*\"|/fc\"" | uniq )
+		mangakeys=$(grep -Eo ">[a-zA-Z.0-9 /?:!'-]*<" <<< "$mangas" | sed 's,<,,g;s,>,,g'| tr '[:upper:]' '[:lower:]')
+		mangachoice=$($menucmd <<< "$mangakeys")
+		[ -z "$mangachoice" ] && break;
+		mangalink=$( grep -i ">$mangachoice<" <<< "$mangas" | grep -Eo 'https://mangakatana.com/manga/[a-zA-Z0-9./?+=-]*' )
+		[ -z "$mangalink" ] && echo "break" && break;
+		site=$(curl -sL $mangalink)
+	else
+		mangalink=$redir
+	fi
+
+	while true; do
+		chapters=$(echo $site | grep -Eo "${mangalink}/c[0-9.\"]*>[a-zA-Z0-9. :?\!()'-]*</a>" | tac)
+		chapterkeys=$(grep -Eo ">[a-zA-Z0-9 .?:/()'-]*<" <<< "$chapters" | sed 's,<,,g;s,>,,g' | tr '[:upper:]' '[:lower:]')
+		chapterlist=$(sed "1i$(tail -n1 <<< "$chapterkeys" )" <<< "$chapterkeys" | head -n -1)
+		chapterchoice=$($menucmd <<< "$chapterlist")
+		[ -z "$chapterchoice" ] && break;
+		chapterlink=$( grep -i ">$chapterchoice<" <<< "$chapters" | grep -Eo "${mangalink}/c[0-9.]*" )
+		[ -z "$chapterlink" ] && break;
+		echo $chapterchoice $chapterlink
+		chaptersite=$(curl -s $chapterlink)
+		picturelinks=$(echo $chaptersite |  grep -Eo "(http|https)://i3.mangakatana.com/token/[a-zA-Z0-9./?=_%:-]*(jpeg|jpg|png)" | uniq)
+		a="a"
+		for i in $picturelinks; do
+			wget -O $HOME/.cache/mangachapters/"$a" $i &> /dev/null &
+			echo fetching page $( echo ${#a} )
+			a="a${a}" 
+		done
+
+		for job in $(jobs -p); do
+			wait $job && echo done
+		done
+
+		sxiv $HOME/.cache/mangachapters 
+		rm $HOME/.cache/mangachapters/* && echo cleaned up || echo error removing files
+	done
+done

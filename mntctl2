@@ -1,0 +1,20 @@
+#!/bin/bash
+# dmenu script to mount/unmount usb drives
+# dependencies: dmenu, systemd
+# edit the lines with udisksctl if you use a distribution without systemd
+# like I did on my laptop
+
+menu="dmenu -i -l 15" #dmenu appearance, edit to your liking
+mode=$(printf 'mount\nunmount' | $menu -p "select mode") #select mode prompt
+if [ "$mode" == "mount" ]; then
+	drive=$(lsblk --noheadings --raw -o NAME,MOUNTPOINT | awk '$1~/s.*/ && $2 == ""' | $menu -p "select drive to mount")
+	drive=/dev/$drive
+	mntpoint=$( find /media -maxdepth 1 -type d -empty | $menu -p "where to mount?" )
+	udevil mount $drive $mntpoint	#mount the drive with udisksctl
+fi
+if [ "$mode" == "unmount" ]; then
+	drive=$(lsblk --noheadings --raw -o NAME,MOUNTPOINT | awk '$1~/s.*/ && $2 != ""' | awk '{print $1}' | $menu -p "select drive to unmount")
+	drive=/dev/$drive
+	udevil umount $drive	#unmount with udisksctl
+fi
+
